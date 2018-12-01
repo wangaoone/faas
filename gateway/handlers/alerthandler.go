@@ -98,20 +98,15 @@ func scaleService(alert requests.PrometheusInnerAlert, service scaling.ServiceQu
 func CalculateReplicas(status string, currentReplicas uint64, maxReplicas uint64, minReplicas uint64, scalingFactor uint64) uint64 {
 	newReplicas := currentReplicas
 	step := uint64((float64(maxReplicas) / 100) * float64(scalingFactor))
-
 	if status == "firing" && step > 0 {
-		if currentReplicas == 1 {
-			newReplicas = step
+		if currentReplicas+step > maxReplicas {
+			newReplicas = maxReplicas
 		} else {
-			if currentReplicas+step > maxReplicas {
-				newReplicas = maxReplicas
-			} else {
-				newReplicas = currentReplicas + step
-			}
+			newReplicas = currentReplicas + step
 		}
-	} else { // Resolved event.
+	} /*else { // Resolved event.
 		newReplicas = minReplicas
-	}
+	}*/
 
 	return newReplicas
 }
